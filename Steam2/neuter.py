@@ -1,6 +1,6 @@
 import configparser, os, utilities
 
-from .package import Package
+from Steam2.package import Package
 from steamemu.config import read_config
 
 filenames = ("SteamNew.exe", "Steam.dll", "SteamUI.dll", "Public\Account.html", "caserver.exe", "cacdll.dll", "CASClient.exe", "unicows.dll", "GameUI.dll")#, "steamclient.dll", "GameOverlayUI.exe", "serverbrowser.dll", "gamoverlayui.dll", "steamclient64.dll", "AppOverlay.dll", "AppOverlay64.dll", "SteamService.exe", "friendsUI.dll", "SteamService.dll")
@@ -420,69 +420,123 @@ ip_addresses_old = (
 
 pkgadd_filelist = []
 
-def neuter_file(file, server_ip, server_port):
-    if config["public_ip"] != "0.0.0.0":
-        fullstring = replacestringsext
-    else:
-        fullstring = replacestrings
-
+def neuter_file(file, server_ip, server_port, config):
+    fullstring = config["replacestringsext"] if config["public_ip"] != "0.0.0.0" else config["replacestrings"]
+    
     for (search, replace, info) in fullstring:
-        try:
-            if search != None and file != None:
-                if search.encode() in file:
-                    if search == "StorefrontURL1":
-                        if ":2004" in config["store_url"]:
-                            file = file.replace(search.encode(), replace.encode())
-                            print("Replaced", info)
-                    else:
-                        fulllength = len(search)
-                        newlength = len(replace)
-                        missinglength = fulllength - newlength
-                        if missinglength < 0:
-                            print("WARNING: Replacement text " + replace + " is too long! Not replaced!")
-                        elif missinglength == 0:
-                            file = file.replace(search.encode(), replace.encode())
-                            print("Replaced", info)
-                        else:
-                            file = file.replace(search.encode(), replace.encode() + b'\x00' * missinglength)
-                            print("Replaced", info)
-        except NameError:
-            print("Config line not found")
-
+        if search.encode() in file:
+            if search == "StorefrontURL1":
+                if ":2004" in config["store_url"]:
+                    file = file.replace(search.encode(), replace.encode())
+                    print("Replaced", info)
+            else:
+                fulllength = len(search)
+                newlength = len(replace)
+                missinglength = fulllength - newlength
+                if missinglength < 0:
+                    print(f"WARNING: Replacement text {replace} is too long! Not replaced!")
+                elif missinglength == 0:
+                    file = file.replace(search.encode(), replace.encode())
+                    print("Replaced", info)
+                else:
+                    file = file.replace(search.encode(), replace.encode() + (b'\x00' * missinglength))
+                    print("Replaced", info)
+    
     search = "207.173.177.11:27030 207.173.177.12:27030"
-
-    if config["public_ip"] != "0.0.0.0":
-        ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " "
-    else:
-        ip = server_ip + ":" + server_port + " "
+    
+    ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " " if config["public_ip"] != "0.0.0.0" else server_ip + ":" + server_port + " "
     searchlength = len(search)
     iplength = len(ip)
     numtoreplace = searchlength // iplength
     ips = (ip * numtoreplace).encode()
     replace = ips.ljust(searchlength, b'\x00')
-    if search != None and file != None:
-        if search.encode() in file:
-            file = file.replace(search.encode(), replace)
-            print("Replaced directory server IP group 0")
+    if search.encode() in file:
+        file = file.replace(search.encode(), replace)
+        print("Replaced directory server IP group 0")
 
-    # Similar blocks for other search strings...
+    search = "207.173.177.11:27030 207.173.177.12:27030 69.28.151.178:27038 69.28.153.82:27038 68.142.88.34:27038 68.142.72.250:27038"
+    
+    ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " " if config["public_ip"] != "0.0.0.0" else server_ip + ":" + server_port + " "
+    searchlength = len(search)
+    iplength = len(ip)
+    numtoreplace = searchlength // iplength
+    ips = (ip * numtoreplace).encode()
+    replace = ips.ljust(searchlength, b'\x00')
+    if search.encode() in file:
+        file = file.replace(search.encode(), replace)
+        print("Replaced directory server IP group 1")
+
+    search = "72.165.61.189:27030 72.165.61.190:27030 69.28.151.178:27038 69.28.153.82:27038 68.142.88.34:27038 68.142.72.250:27038"
+    
+    ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " " if config["public_ip"] != "0.0.0.0" else server_ip + ":" + server_port + " "
+    searchlength = len(search)
+    iplength = len(ip)
+    numtoreplace = searchlength // iplength
+    ips = (ip * numtoreplace).encode()
+    replace = ips.ljust(searchlength, b'\x00')
+    if search.encode() in file:
+        file = file.replace(search.encode(), replace)
+        print("Replaced directory server IP group 2")
+
+    search = "72.165.61.189:27030 72.165.61.190:27030 69.28.151.178:27038 69.28.153.82:27038 87.248.196.194:27038 68.142.72.250:27038"
+    
+    ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " " if config["public_ip"] != "0.0.0.0" else server_ip + ":" + server_port + " "
+    searchlength = len(search)
+    iplength = len(ip)
+    numtoreplace = searchlength // iplength
+    ips = (ip * numtoreplace).encode()
+    replace = ips.ljust(searchlength, b'\x00')
+    if search.encode() in file:
+        file = file.replace(search.encode(), replace)
+        print("Replaced directory server IP group 3")
+
+    search = "127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030"
+    
+    ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " " if config["public_ip"] != "0.0.0.0" else server_ip + ":"
+            
+    search = "127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030 127.0.0.1:27030"
+    if config["public_ip"] != "0.0.0.0" :
+        ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " "
+    else :
+        ip = server_ip + ":" + server_port + " "
+    searchlength = len(search)
+    iplength = len(ip)
+    numtoreplace = searchlength // iplength
+    ips = ip * numtoreplace
+    replace = ips.ljust(searchlength, '\x00')
+    if file.find(search) != -1 :
+        file = file.replace(search, replace)
+        print ("Replaced directory server IP group 4")
+            
+    search = "208.64.200.189:27030 208.64.200.190:27030 208.64.200.191:27030 208.78.164.7:27038"
+    if config["public_ip"] != "0.0.0.0" :
+        ip = config["public_ip"] + ":" + server_port + " " + config["server_ip"] + ":" + server_port + " "
+    else :
+        ip = server_ip + ":" + server_port + " "
+    searchlength = len(search)
+    iplength = len(ip)
+    numtoreplace = searchlength // iplength
+    ips = ip * numtoreplace
+    replace = utilities.ljust_bytes(ips.encode(), searchlength, b'\x00')
+    if file.find(search.encode()) != -1 :
+        file = file.replace(search, replace)
+        print("Replaced directory server IP group 5")
 
         for ip in ip_addresses_old:
             loc = file.find(ip.encode())
             if loc != -1:
                 if config["public_ip"] != "0.0.0.0":
                     server_ip = config["public_ip"]
-                    replace_ip = utilities.ljust_bytes(server_ip.encode(), 16, b'\x00')
+                    replace_ip = utilities.ljust_bytes(server_ip.encode(), searchlength, b'\x00')
                     file = file[:loc] + replace_ip + file[loc + 16:]
                     print("Found and replaced IP %16s at location %08x" % (ip, loc))
                 else:
-                    replace_ip = utilities.ljust_bytes(server_ip.encode(), 16, b'\x00')
+                    replace_ip = utilities.ljust_bytes(server_ip.encode(), searchlength, b'\x00')
 
                     file = file[:loc] + replace_ip + file[loc + 16:]
                     print("Found and replaced IP %16s at location %08x" % (ip, loc))
 
     return file
-
     
 def neuter(pkg_in, pkg_out, server_ip, server_port) :
     f = open(pkg_in, "rb")

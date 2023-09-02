@@ -48,7 +48,6 @@ class Package(object) :
             chunks.append(zlib.compress(filedata[i:i+0x8000], self.compress_level))
         self.file_chunks[filename] = chunks
         self.file_unpacked_sizes[filename] = len(filedata)
-        print(repr(self.filenames))
         if filename not in self.filenames :
             self.filenames.append(filename)
     

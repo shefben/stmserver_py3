@@ -39,6 +39,7 @@ class Package(object) :
         file = []
         for chunk in self.file_chunks[filename_bytes] :
             file.append(zlib.decompress(chunk))
+        
         return b"".join(file)
 
     def put_file(self, filename, filedata) :
@@ -47,6 +48,7 @@ class Package(object) :
             chunks.append(zlib.compress(filedata[i:i+0x8000], self.compress_level))
         self.file_chunks[filename] = chunks
         self.file_unpacked_sizes[filename] = len(filedata)
+        print(repr(self.filenames))
         if filename not in self.filenames :
             self.filenames.append(filename)
     
@@ -67,6 +69,6 @@ class Package(object) :
                 datasection_length += chunk_length
                 packedbytes += chunk_length
 
-            indexsection.insert(0, filename + "\x00" + struct.pack("<LLLL", self.file_unpacked_sizes[filename], packedbytes, outfileoffset, len(filename) + 1))
+            indexsection.insert(0, filename + b"\x00" + struct.pack("<LLLL", self.file_unpacked_sizes[filename], packedbytes, outfileoffset, len(filename) + 1))
 
-        return "".join(datasection) + "".join(indexsection) + struct.pack("<BLL", self.pkg_ver, self.compress_level, number_of_files)
+        return b"".join(datasection) + b"".join(indexsection) + struct.pack("<BLL", self.pkg_ver, self.compress_level, number_of_files)

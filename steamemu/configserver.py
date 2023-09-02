@@ -307,13 +307,13 @@ class configserver(threading.Thread):
 
                     if checksum == command[1:] :
                         log.info(clientid + "Client has matching checksum for secondblob")
-                        log.debug(clientid + "We validate it: " + binascii.b2a_hex(blob).decode())
+                        log.debug(clientid + "We validate it: " + binascii.b2a_hex(command).decode())
 
                         self.socket.send(b"\x00\x00\x00\x00")
 
                     else :
                         log.info(clientid + "Client didn't match our checksum for secondblob")
-                        log.debug(clientid + "Sending new blob: " + binascii.b2a_hex(blob).decode())
+                        log.debug(clientid + "Sending new blob: " + binascii.b2a_hex(command).decode())
 
                         self.socket.send_withlen(blob, False)
                 else :
